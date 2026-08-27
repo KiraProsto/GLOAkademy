@@ -1,10 +1,29 @@
 'use strict';
 
-let title = prompt('как называется ваш проект?');
-let screens = prompt('Какие типы экранов нужно разработать?');
-let screenPrice = +prompt('Сколько будет стоить данная работа?');
-let adaptive = confirm('Нужен ли адаптив на сайте?');
+let screens = 'Простые, Сложные, Интерактивные';
+let screenPrice = 1000;
 let rollback = 25;
+let fullPrice = 123456789000000000000000;
+let adaptive = true;
+
+alert('Hello, world!');
+console.log('this is console');
+
+console.log(typeof title);
+console.log(typeof fullPrice);
+console.log(typeof adaptive);
+
+console.log(screens.length);
+console.log('Стоимость верстки экранов ' + screenPrice + ' долларов');
+console.log('Стоимость разработки сайта ' + fullPrice + ' долларов');
+
+console.log(screens.toLowerCase().split(', '));
+console.log(fullPrice * (rollback / 100));
+
+const title = prompt('как называется ваш проект?');
+screens = prompt('Какие типы экранов нужно разработать?');
+screenPrice = +prompt('Сколько будет стоить данная работа?');
+adaptive = confirm('Нужен ли адаптив на сайте?');
 
 const service1 = prompt('Какой дополнительный тип услуги нужен?');
 const servicePrice1 = +prompt('Сколько это будет стоить?');
