@@ -1,6 +1,5 @@
 'use strict';
 
-let title = 'Lesson2';
 let screens = 'Простые, Сложные, Интерактивные';
 let screenPrice = 1000;
 let rollback = 25;
@@ -21,7 +20,7 @@ console.log('Стоимость разработки сайта ' + fullPrice + 
 console.log(screens.toLowerCase().split(', '));
 console.log(fullPrice * (rollback / 100));
 
-title = prompt('как называется ваш проект?');
+const title = prompt('как называется ваш проект?');
 screens = prompt('Какие типы экранов нужно разработать?');
 screenPrice = +prompt('Сколько будет стоить данная работа?');
 adaptive = confirm('Нужен ли адаптив на сайте?');
