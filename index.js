@@ -49,16 +49,17 @@ const appData = {
         price = +prompt('Сколько это будет стоить?', '1000');
       } while (!this.isNum(price));
 
-      this.services[name] = +price;
+      this.services[name + '_' + i] = +price;
     }
 
     this.adaptive = confirm('Нужен ли адаптив на сайте?');
   },
 
   addPrices: function () {
-    for (let screen of this.screens) {
-      this.screenPrice += screen.price;
-    }
+    this.screenPrice = this.screens.reduce(
+      (acc, screen) => acc + screen.price,
+      0,
+    );
 
     for (let key in this.services) {
       this.allServicePrices += this.services[key];
