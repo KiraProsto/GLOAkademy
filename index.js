@@ -2,72 +2,91 @@
 
 const appData = {
   title: '',
-  screens: '',
+  screens: [],
   screenPrice: 0,
   adaptive: true,
   rollback: 25,
   allServicePrices: 0,
   fullPrice: 0,
   servicePercentPrice: 0,
-  service1: '',
-  service2: '',
+  services: {},
+  start: function () {
+    this.asking();
+    this.addPrices();
+    this.getFullPrice();
+    this.getTitle();
+    this.getServicePercentPrice();
+    this.logger();
+  },
+
   asking: function () {
-    this.title = prompt('как называется ваш проект?', 'Калькулятор верстки');
-    this.screens = prompt(
-      'Какие типы экранов нужно разработать?',
-      'Сложные, Интерактивные',
-    );
-
     do {
-      this.screenPrice = prompt('Сколько будет стоить данная работа?', '15000');
-    } while (!this.isNum(this.screenPrice));
+      this.title = prompt('как называется ваш проект?', 'Калькулятор верстки');
+    } while (!this.isString(this.title));
 
-    this.screenPrice = +this.screenPrice;
+    for (let i = 0; i < 2; i++) {
+      let name;
+      do {
+        name = prompt('Какие типы экранов нужно разработать?');
+      } while (!this.isString(name));
+      let price = 0;
+
+      do {
+        price = +prompt('Сколько будет стоить данная работа?', '15000');
+      } while (!this.isNum(price));
+
+      this.screens.push({ id: i, name: name, price: price });
+    }
+
+    for (let i = 0; i < 2; i++) {
+      let name;
+      do {
+        name = prompt('Какой дополнительный тип услуги нужен?');
+      } while (!this.isString(name));
+      let price = 0;
+
+      do {
+        price = +prompt('Сколько это будет стоить?', '1000');
+      } while (!this.isNum(price));
+
+      this.services[name] = +price;
+    }
+
     this.adaptive = confirm('Нужен ли адаптив на сайте?');
+  },
+
+  addPrices: function () {
+    for (let screen of this.screens) {
+      this.screenPrice += screen.price;
+    }
+
+    for (let key in this.services) {
+      this.allServicePrices += this.services[key];
+    }
   },
 
   isNum: function (num) {
     return !isNaN(parseFloat(num)) && isFinite(num);
   },
 
-  getAllServicePrices: function () {
-    let sum = 0;
-    let price;
-
-    for (let i = 0; i < 2; i++) {
-      if (i === 0) {
-        this.service1 = prompt(
-          'Какой дополнительный тип услуги нужен?',
-          'Кулл',
-        );
-      } else if (i === 1) {
-        this.service2 = prompt(
-          'Какой дополнительный тип услуги нужен?',
-          'прикол',
-        );
-      }
-      do {
-        price = prompt('Сколько это будет стоить?', '1000');
-      } while (!this.isNum(price));
-
-      sum += +price;
-    }
-    return sum;
+  isString: function (str) {
+    return isNaN(str) && typeof str === 'string';
   },
 
   getFullPrice: function () {
-    return this.screenPrice + this.allServicePrices;
+    this.fullPrice = this.screenPrice + this.allServicePrices;
   },
 
   getTitle: function () {
-    return (
+    this.title =
       this.title.trim().charAt(0).toUpperCase() +
-      this.title.trim().slice(1).toLowerCase()
-    );
+      this.title.trim().slice(1).toLowerCase();
   },
 
-  getServicePercentPrices: function () {
-    return Math.ceil(this.fullPrice - this.fullPrice * (this.rollback / 100));
+  getServicePercentPrice: function () {
+    this.servicePercentPrice = Math.ceil(
+      this.fullPrice - this.fullPrice * (this.rollback / 100),
+    );
   },
 
   getRollbackMessage: function () {
@@ -82,19 +101,10 @@ const appData = {
     }
   },
 
-  start: function () {
-    this.asking();
-    this.allServicePrices = this.getAllServicePrices();
-    this.fullPrice = this.getFullPrice();
-    this.title = this.getTitle();
-    this.servicePercentPrice = this.getServicePercentPrices();
-    this.logger();
-  },
-
   logger: function () {
     for (let key in this) {
       if (typeof this[key] !== 'function') {
-        console.log(`${key}: ${this[key]}`);
+        console.log(`${key}:`, this[key]);
       }
     }
     console.log('Сообщение по откату: ' + this.getRollbackMessage());
