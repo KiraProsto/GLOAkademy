@@ -21,7 +21,15 @@ const totalCountOther = totalInputs[2];
 const totalFullCount = totalInputs[3];
 const totalCountRollback = totalInputs[4];
 
+const cmsOpen = document.getElementById('cms-open');
+const hiddenCmsVariants = document.querySelector('.hidden-cms-variants');
+const cmsSelect = hiddenCmsVariants.querySelector('select');
+const cmsOtherInput = hiddenCmsVariants.querySelector('.main-controls__input');
+
 let screenBlock = document.querySelectorAll('.screen');
+
+hiddenCmsVariants.style.display = 'none';
+cmsOtherInput.style.display = 'none';
 
 const appData = {
   title: '',
@@ -37,6 +45,9 @@ const appData = {
   servicesPercent: {},
   servicesNumber: {},
   initialScreenCount: 1,
+  cmsPercent: 0,
+  cmsPrice: 0,
+
   init() {
     this.addTitle();
 
@@ -55,6 +66,23 @@ const appData = {
     rollbackInput.addEventListener('input', () => {
       rollbackValue.textContent = rollbackInput.value + '%';
       this.rollback = +rollbackInput.value;
+    });
+
+    cmsOpen.addEventListener('change', () => {
+      if (cmsOpen.checked) {
+        hiddenCmsVariants.style.display = 'flex';
+      } else {
+        hiddenCmsVariants.style.display = 'none';
+        cmsOtherInput.style.display = 'none';
+      }
+    });
+
+    cmsSelect.addEventListener('change', () => {
+      if (cmsSelect.value === 'other') {
+        cmsOtherInput.style.display = 'block';
+      } else {
+        cmsOtherInput.style.display = 'none';
+      }
     });
 
     btnReset.style.display = 'none';
@@ -77,22 +105,21 @@ const appData = {
     this.screenPrice = 0;
     this.servicePricesPercent = 0;
     this.servicePricesNumber = 0;
+    this.fullPrice = 0;
 
     this.addScreens();
     this.addServices();
     this.addPrices();
+    this.addCmsPrice();
     this.showResult();
 
     this.disableInputs();
 
     btnCalculate.style.display = 'none';
     btnReset.style.display = 'block';
-
-    // this.logger();
   },
 
   reset() {
-    this.title = '';
     this.screens = [];
     this.screenCount = 0;
     this.screenPrice = 0;
@@ -104,6 +131,9 @@ const appData = {
     this.servicesPercent = {};
     this.servicesNumber = {};
 
+    this.cmsPercent = 0;
+    this.cmsPrice = 0;
+
     total.value = '';
     totalCount.value = '';
     totalCountOther.value = '';
@@ -113,23 +143,17 @@ const appData = {
     rollbackInput.value = 25;
     rollbackValue.textContent = '25%';
 
-    const textInputs = document.querySelectorAll('input[type="text"]');
-
-    textInputs.forEach((input) => {
+    document.querySelectorAll('input[type="text"]').forEach((input) => {
       input.value = '';
       input.disabled = false;
     });
 
-    const selects = document.querySelectorAll('select');
-
-    selects.forEach((select) => {
+    document.querySelectorAll('select').forEach((select) => {
       select.selectedIndex = 0;
       select.disabled = false;
     });
 
-    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-
-    checkboxes.forEach((checkbox) => {
+    document.querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
       checkbox.checked = false;
     });
 
@@ -140,8 +164,45 @@ const appData = {
       screenBlock = document.querySelectorAll('.screen');
     }
 
+    cmsOpen.disabled = false;
+    cmsOpen.checked = false;
+
+    hiddenCmsVariants.style.display = 'none';
+    cmsOtherInput.style.display = 'none';
+
+    cmsSelect.selectedIndex = 0;
+
+    const cmsTextInput = cmsOtherInput.querySelector('input');
+
+    if (cmsTextInput) {
+      cmsTextInput.value = '';
+    }
+
     btnReset.style.display = 'none';
     btnCalculate.style.display = 'block';
+  },
+
+  addCmsPrice() {
+    this.cmsPercent = 0;
+    this.cmsPrice = 0;
+
+    if (!cmsOpen.checked) {
+      return;
+    }
+
+    const percent = Number(cmsSelect.value);
+
+    if (!isNaN(percent)) {
+      this.cmsPercent = percent;
+
+      this.cmsPrice = this.fullPrice * (percent / 100);
+
+      this.fullPrice += this.cmsPrice;
+
+      this.servicePercentPrice = Math.ceil(
+        this.fullPrice - this.fullPrice * (this.rollback / 100),
+      );
+    }
   },
 
   showResult() {
@@ -233,6 +294,7 @@ const appData = {
 
   disableInputs() {
     const textInputs = document.querySelectorAll('input[type="text"]');
+
     const selects = document.querySelectorAll('select');
 
     textInputs.forEach((input) => {
@@ -242,6 +304,8 @@ const appData = {
     selects.forEach((select) => {
       select.disabled = true;
     });
+
+    cmsOpen.disabled = true;
   },
 
   checkScreens() {
@@ -251,15 +315,6 @@ const appData = {
 
       return select.value !== '' && input.value !== '';
     });
-  },
-
-  logger() {
-    for (let key in this) {
-      if (typeof this[key] !== 'function') {
-        console.log(`${key}:`, this[key]);
-      }
-    }
-    console.log('Сообщение по откату: ' + this.getRollbackMessage());
   },
 };
 
